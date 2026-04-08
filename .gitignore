@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+lib
+*.tsbuildinfo
+
+# Env (secrets)
+.env
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+
+# Runtime uploads (keep dir locally; optional: add storage/.gitkeep)
+storage/*
+!storage/.gitkeep
+
+# Local SQLite (recriar com migrate/seed)
+*.db
+*.db-journal
+
+# Prisma: keep schema + migrations; ignore accidental TS compile of seed
+prisma/seed.js
+prisma/seed.js.map
+prisma/seed.d.ts
+
+# Test / coverage
+coverage
+
+# IDE
+.idea
+.vscode/*
+!.vscode/extensions.json

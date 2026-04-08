@@ -1,0 +1,509 @@
+// Portável: troque apenas provider/url no datasource para PostgreSQL, MySQL ou SQL Server.
+// https://www.prisma.io/docs/orm/reference/prisma-schema-reference
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enums de domínio são String no SQLite; constantes em src/common/prisma-enums.ts
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("CLIENT")
+  /// Cliente: empresa fixa. Admin/Consultor: null (contexto via X-Company-Id ou primeira empresa).
+  companyId    String?
+  company      Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  uploadedFiles      UploadedFile[]
+  esocialBatches     ESocialImportBatch[] @relation("BatchRequester")
+  auditLogs          AuditLog[]
+
+  @@index([companyId])
+}
+
+model Company {
+  id                      String             @id @default(uuid())
+  clientDisplayName       String
+  legalName               String?
+  taxId                   String?
+  contactEmail            String?
+  contactPhone            String?
+  hasBranches             Boolean            @default(false)
+  hasDifferentBranchLogos Boolean            @default(false)
+  currentStage            Int                @default(1)
+  onboardingStatus        String             @default("NOT_STARTED")
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  contactPerson          ContactPerson?
+  branches               Branch[]
+  logos                  CompanyLogo[]
+  uploadedFiles          UploadedFile[]
+  wizardStages           WizardStage[]
+  wizardStepProgress     WizardStepProgress[]
+  workSchedules          WorkSchedule[]
+  costCenters            CostCenter[]
+  employeePaymentBanks   EmployeePaymentBank[]
+  departments            Department[]
+  pensionConfiguration   PensionConfiguration?
+  historicalPayrollFiles HistoricalPayrollFile[]
+  leaveRecords           LeaveRecord[]
+  dependentRecords       DependentRecord[]
+  employeeRegistryFiles  EmployeeRegistryFile[]
+  taxReliefConfiguration TaxReliefConfiguration?
+  vacationRecords        VacationRecord[]
+  benefits               Benefit[]
+  payrollRubrics         PayrollRubric[]
+  esocialBatches         ESocialImportBatch[]
+  auditLogs              AuditLog[]
+  users                  User[]
+
+  @@index([taxId])
+}
+
+model ContactPerson {
+  id        String   @id @default(uuid())
+  companyId String   @unique
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  cpf       String?
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  legalName String?
+  taxId     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  costCenters CostCenter[]
+  logos       CompanyLogo[]
+
+  @@unique([companyId, taxId])
+  @@index([companyId])
+}
+
+model UploadedFile {
+  id            String         @id @default(uuid())
+  companyId     String?
+  company       Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  stageNumber   Int?
+  stepNumber    Int?
+  category      String         @default("OTHER")
+  originalName  String
+  storagePath   String
+  mimeType      String
+  extension     String
+  size          Int
+  uploadedById  String?
+  uploadedBy    User?          @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  illegible     Boolean        @default(false)
+  userNote      String?
+  createdAt     DateTime       @default(now())
+
+  companyLogos            CompanyLogo[]
+  historicalPayrolls      HistoricalPayrollFile[]
+  employeeRegistryFiles   EmployeeRegistryFile[]
+  benefitSupplierLayouts  BenefitSupplierLayoutFile[]
+
+  @@index([companyId, category])
+}
+
+model CompanyLogo {
+  id              String    @id @default(uuid())
+  companyId       String
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId        String?
+  branch          Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  uploadedFileId  String
+  uploadedFile    UploadedFile @relation(fields: [uploadedFileId], references: [id], onDelete: Cascade)
+  scope           String    @default("COMPANY")
+  createdAt       DateTime  @default(now())
+
+  @@index([companyId])
+}
+
+model WizardStage {
+  id                       String        @id @default(uuid())
+  companyId                String
+  company                  Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stageNumber              Int
+  title                    String
+  status                   String        @default("NOT_STARTED")
+  startedAt                DateTime?
+  completedAt              DateTime?
+  submittedForValidationAt DateTime?
+  approvedAt               DateTime?
+  rejectedAt               DateTime?
+  reviewerNotes            String?
+  finalNotes               String?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  @@unique([companyId, stageNumber])
+  @@index([companyId])
+}
+
+model WizardStepProgress {
+  id          String     @id @default(uuid())
+  companyId   String
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stageNumber Int
+  stepNumber  Int
+  title       String
+  status      String     @default("NOT_STARTED")
+  isRequired  Boolean    @default(true)
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([companyId, stageNumber, stepNumber])
+  @@index([companyId, stageNumber])
+}
+
+model WorkSchedule {
+  id                     String       @id @default(uuid())
+  companyId              String
+  company                Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name                   String
+  journeyType            String       @default("FIXED")
+  startTime              String?
+  endTime                String?
+  breakMinutes           Int          @default(0)
+  weeklyRestSuggestion   String?
+  workloadDailyMinutes   Int?
+  active                 Boolean      @default(true)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  weekdays WorkScheduleWeekday[]
+
+  @@index([companyId])
+}
+
+model WorkScheduleWeekday {
+  id              String         @id @default(uuid())
+  workScheduleId  String
+  workSchedule    WorkSchedule   @relation(fields: [workScheduleId], references: [id], onDelete: Cascade)
+  weekday         Int
+
+  @@unique([workScheduleId, weekday])
+}
+
+model CostCenter {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId  String?
+  branch    Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  code      String
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  departments    Department[]
+  defaultRubrics PayrollRubric[] @relation("RubricDefaultCC")
+
+  @@unique([companyId, code])
+  @@index([companyId])
+}
+
+model BankReference {
+  id       String  @id @default(uuid())
+  code     String  @unique
+  name     String
+  isActive Boolean @default(true)
+
+  employeeBanks EmployeePaymentBank[]
+}
+
+model EmployeePaymentBank {
+  id               String        @id @default(uuid())
+  companyId        String
+  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bankReferenceId  String
+  bankReference    BankReference @relation(fields: [bankReferenceId], references: [id], onDelete: Restrict)
+  agency           String
+  agencyDigit      String?
+  accountType      String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([companyId])
+}
+
+model Department {
+  id             String      @id @default(uuid())
+  companyId      String
+  company        Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  code           String
+  name           String
+  costCenterId   String?
+  costCenter     CostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+  active         Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  defaultRubrics PayrollRubric[] @relation("RubricDefaultDept")
+
+  @@unique([companyId, code])
+  @@index([companyId])
+}
+
+model PensionConfiguration {
+  id               String   @id @default(uuid())
+  companyId        String   @unique
+  company          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  hasActivePension Boolean  @default(false)
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model HistoricalPayrollFile {
+  id             String       @id @default(uuid())
+  companyId      String
+  company        Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  competence     String
+  uploadedFileId String
+  uploadedFile   UploadedFile @relation(fields: [uploadedFileId], references: [id], onDelete: Cascade)
+  userNote       String?
+  totalEarnings  Decimal?
+  totalDeductions Decimal?
+  createdAt      DateTime     @default(now())
+
+  @@unique([companyId, competence])
+}
+
+model LeaveRecord {
+  id                 String   @id @default(uuid())
+  companyId          String
+  company            Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeName       String
+  leaveType          String
+  startDate          DateTime
+  expectedReturnDate DateTime?
+  sourceType         String   @default("MANUAL")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model DependentRecord {
+  id              String   @id @default(uuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  dependentName   String
+  cpf             String?
+  dependencyType  String
+  motherName      String?
+  birthDate       DateTime?
+  sourceType      String   @default("MANUAL")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model EmployeeRegistryFile {
+  id             String       @id @default(uuid())
+  companyId      String
+  company        Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  uploadedFileId String
+  uploadedFile   UploadedFile @relation(fields: [uploadedFileId], references: [id], onDelete: Cascade)
+  userNote       String?
+  createdAt      DateTime     @default(now())
+}
+
+model TaxReliefConfiguration {
+  id            String   @id @default(uuid())
+  companyId     String   @unique
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  hasTaxRelief  Boolean  @default(false)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model VacationRecord {
+  id               String   @id @default(uuid())
+  companyId        String
+  company          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeName     String
+  accrualStartDate DateTime
+  accrualEndDate   DateTime
+  takenDays        Int      @default(0)
+  pendingDays      Int      @default(0)
+  sourceType       String   @default("MANUAL")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model Benefit {
+  id                         String                  @id @default(uuid())
+  companyId                  String
+  company                    Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  type                       String
+  internalName               String
+  paymentRuleType            String
+  companyPercentage          Decimal?
+  employeePercentage         Decimal?
+  hasDependents              Boolean                 @default(false)
+  dependentCompanyPercentage Decimal?
+  dependentEmployeePercentage Decimal?
+  valueType                  String
+  defaultValue               Decimal?
+  transportDiscountPercent   Decimal?
+  isActive                   Boolean                 @default(true)
+  understoodAck              Boolean                 @default(false)
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @updatedAt
+
+  suppliers BenefitSupplier[]
+
+  @@index([companyId])
+}
+
+model BenefitSupplier {
+  id         String   @id @default(uuid())
+  benefitId  String
+  benefit    Benefit  @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+  name       String
+  taxId      String?
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  layoutFiles BenefitSupplierLayoutFile[]
+}
+
+model BenefitSupplierLayoutFile {
+  id                String          @id @default(uuid())
+  benefitSupplierId String
+  benefitSupplier   BenefitSupplier @relation(fields: [benefitSupplierId], references: [id], onDelete: Cascade)
+  uploadedFileId    String
+  uploadedFile      UploadedFile    @relation(fields: [uploadedFileId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+}
+
+model PayrollRubric {
+  id                   String      @id @default(uuid())
+  companyId            String
+  company              Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  code                 String
+  name                 String
+  rubricType           String
+  nature               String?
+  incidenceINSS        Boolean     @default(false)
+  incidenceFGTS        Boolean     @default(false)
+  incidenceIRRF        Boolean     @default(false)
+  incidenceESocial     Boolean     @default(false)
+  recurrenceType       String      @default("MONTHLY")
+  defaultCostCenterId  String?
+  defaultCostCenter    CostCenter? @relation("RubricDefaultCC", fields: [defaultCostCenterId], references: [id], onDelete: SetNull)
+  defaultDepartmentId  String?
+  defaultDepartment    Department? @relation("RubricDefaultDept", fields: [defaultDepartmentId], references: [id], onDelete: SetNull)
+  isActive             Boolean     @default(true)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@unique([companyId, code])
+  @@index([companyId])
+}
+
+model ESocialImportBatch {
+  id                       String               @id @default(uuid())
+  companyId                String
+  company                  Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  requestedById            String?
+  requestedBy              User?                @relation("BatchRequester", fields: [requestedById], references: [id], onDelete: SetNull)
+  certificateType          String
+  certificateTaxId         String?
+  certificatePasswordHint  String?
+  environment              String
+  periodStart              DateTime
+  periodEnd                DateTime
+  selectedEventsJson       String
+  status                   String               @default("PENDING")
+  confirmationTextAccepted Boolean              @default(false)
+  confirmedAt              DateTime?
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+
+  stageRecords ESocialImportStageRecord[]
+  alerts       ESocialImportAlert[]
+
+  @@index([companyId])
+}
+
+model ESocialImportStageRecord {
+  id         String            @id @default(uuid())
+  batchId    String
+  batch      ESocialImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  recordType String
+  externalId String?
+  payloadJson String
+  status     String            @default("STAGED")
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@index([batchId])
+}
+
+model ESocialImportAlert {
+  id          String             @id @default(uuid())
+  batchId     String
+  batch       ESocialImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  severity    String
+  alertType   String
+  title       String
+  description String?
+  createdAt   DateTime           @default(now())
+
+  @@index([batchId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  companyId  String?
+  company    Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  metaJson   String?
+  createdAt  DateTime @default(now())
+
+  @@index([companyId])
+  @@index([createdAt])
+}
+
+model AppSettings {
+  id        String   @id @default("default")
+  dataJson  String   @default("{}")
+  updatedAt DateTime @updatedAt
+}
