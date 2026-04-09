@@ -4,9 +4,15 @@
  * No runtime do Nest, `file:./dev.db` pode ser resolvido em relação ao cwd do processo,
  * abrindo um SQLite vazio (sem tabelas). Ancoramos caminhos relativos ao diretório
  * `prisma/` onde está o schema, alinhado ao `prisma db push` / migrate.
+ *
+ * Carrega `.env` aqui (e não só no ConfigModule) para que DATABASE_URL exista antes do
+ * fallback `render.db`; senão o dotenv do Nest não sobrescreve a variável já definida.
  */
+import { config as loadEnv } from 'dotenv';
 import { existsSync } from 'fs';
 import { dirname, join } from 'path';
+
+loadEnv({ path: join(process.cwd(), '.env') });
 
 function findPrismaDir(startDir: string): string {
   let dir = startDir;

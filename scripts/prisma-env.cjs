@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config({ path: require('path').join(process.cwd(), '.env') });
+
 /**
  * Espelha src/instrument-env.ts em CommonJS para rodar antes do Prisma CLI,
  * sem depender de lib/ (nest build pode ainda não ter rodado).
