@@ -7,9 +7,9 @@
   },
   "scripts": {
     "build": "nest build",
-    "build:deploy": "prisma generate && nest build && prisma migrate deploy",
+    "build:deploy": "prisma generate && nest build && node scripts/migrate-deploy.cjs",
     "start": "nest start",
-    "start:prod": "prisma migrate deploy && node lib/src/main.js",
+    "start:prod": "node scripts/start-prod.cjs",
     "start:dev": "nest start --watch",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
