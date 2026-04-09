@@ -1,4 +1,4 @@
-# Opcional: Blueprint Render — ou copie só buildCommand/startCommand para o painel do serviço.
+# Build DEVE incluir nest build (yarn build:deploy). Só "yarn" não gera lib/ e o start falha.
 services:
   - type: web
     name: folha-wizard-api
