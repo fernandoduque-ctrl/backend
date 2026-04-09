@@ -3,7 +3,7 @@
     Mescla a branch dev na main e envia para origin (repositório backend — folha-solid-wizard-backend).
 
 .DESCRIPTION
-    fetch -> checkout main -> pull -> merge dev -> push origin main
+    fetch -> checkout main -> pull -> merge dev -> push origin main -> checkout dev
     Raiz do repo: pasta pai de scripts/ por padrão.
 
 .EXAMPLE
@@ -42,5 +42,6 @@ Invoke-Git @('checkout', 'main')
 Invoke-Git @('pull', 'origin', 'main')
 Invoke-Git @('merge', 'dev', '-m', "Merge branch 'dev' into main")
 Invoke-Git @('push', 'origin', 'main')
+Invoke-Git @('checkout', 'dev')
 
-Write-Host "Concluído: main atualizada e enviada para origin." -ForegroundColor Green
+Write-Host "Concluído: main atualizada e enviada para origin; branch atual: dev." -ForegroundColor Green
