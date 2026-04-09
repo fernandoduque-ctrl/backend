@@ -1,4 +1,4 @@
-# Build ideal: yarn && yarn build:deploy. Só "yarn" força compile no start (mais lento); o script usa stub HTTP na PORT durante o build para o health check da Render.
+# Build ideal: yarn && yarn build:deploy. No primeiro deploy (0 usuários), start-prod roda seed automático; defina SKIP_AUTO_SEED=true se não quiser.
 services:
   - type: web
     name: folha-wizard-api

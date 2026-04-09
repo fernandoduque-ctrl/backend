@@ -69,6 +69,27 @@ async function run() {
     process.exit(1);
   }
 
+  const skipSeed =
+    process.env.SKIP_AUTO_SEED === '1' || /^true$/i.test(String(process.env.SKIP_AUTO_SEED || ''));
+  if (!skipSeed) {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+      const users = await prisma.user.count();
+      if (users === 0) {
+        console.log('[start-prod] Nenhum usuário no banco — rodando prisma db seed (admin + massa demo).');
+        execSync('npx prisma db seed', {
+          stdio: 'inherit',
+          cwd: root,
+          env: process.env,
+          shell: true,
+        });
+      }
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   if (healthServer) {
     await new Promise((resolve) => healthServer.close(() => resolve()));
     console.log('[start-prod] Encerrado health stub; subindo Nest…');
