@@ -19,7 +19,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
     "db:push": "prisma db push",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "merge-main": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/merge-dev-to-main.ps1"
   },
   "prisma": {
     "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
