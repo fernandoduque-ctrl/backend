@@ -1,0 +1,7 @@
+# Opcional: Blueprint Render — ou copie só buildCommand/startCommand para o painel do serviço.
+services:
+  - type: web
+    name: folha-wizard-api
+    runtime: node
+    buildCommand: yarn && yarn build:deploy
+    startCommand: yarn start:prod
