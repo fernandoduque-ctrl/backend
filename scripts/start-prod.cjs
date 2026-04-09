@@ -2,22 +2,38 @@
 
 const { existsSync } = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
-const { root } = require('./prisma-env.cjs');
+const { execSync, spawn } = require('child_process');
+const { root, loadInstrumentEnv } = require('./prisma-env.cjs');
 const { runMigrateDeploy } = require('./migrate-deploy.cjs');
+
+loadInstrumentEnv();
 
 const mainJs = path.join(root, 'lib', 'src', 'main.js');
 if (!existsSync(mainJs)) {
-  console.error(
-    '[start-prod] Falta lib/src/main.js — o Nest não foi compilado neste deploy.\n' +
-      'Na Render, altere o Build Command para (exemplo):\n' +
-      '  yarn && yarn build:deploy\n' +
-      'Só "yarn" instala pacotes e não gera lib/.',
+  console.warn(
+    '[start-prod] lib/ ausente — compilando no startup (recomendado na Render: Build Command = yarn && yarn build:deploy).',
   );
+  execSync('npx prisma generate', {
+    stdio: 'inherit',
+    cwd: root,
+    env: process.env,
+    shell: true,
+  });
+  execSync('npx nest build', {
+    stdio: 'inherit',
+    cwd: root,
+    env: process.env,
+    shell: true,
+  });
+}
+
+if (!existsSync(mainJs)) {
+  console.error('[start-prod] Falha: lib/src/main.js ainda não existe após nest build.');
   process.exit(1);
 }
 
 runMigrateDeploy();
+
 const child = spawn(process.execPath, [mainJs], {
   stdio: 'inherit',
   cwd: root,
