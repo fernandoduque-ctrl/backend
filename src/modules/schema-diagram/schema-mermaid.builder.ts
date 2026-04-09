@@ -1,3 +1,5 @@
+import { columnBriefForErDiagram } from './schema-column-descriptions';
+
 /** Subconjunto do DMMF usado na geração do Mermaid (evita depender de pacotes de tipos extras). */
 export type DmmfField = {
   name: string;
@@ -9,6 +11,8 @@ export type DmmfField = {
   isList: boolean;
   relationName?: string | null;
   relationFromFields?: string[];
+  /** Comentário `///` do Prisma, repassado ao comentário Mermaid no SVG. */
+  documentation?: string;
 };
 
 export type DmmfModel = {
@@ -55,6 +59,11 @@ function fkFieldNamesForModel(model: DmmfModel): Set<string> {
   return names;
 }
 
+function mermaidAttributeComment(modelName: string, field: DmmfField): string {
+  const text = columnBriefForErDiagram(modelName, field.name, field.documentation);
+  return ` "${text}"`;
+}
+
 function buildEntityBlock(model: DmmfModel): string[] {
   const fkCols = fkFieldNamesForModel(model);
   const lines: string[] = [`  ${model.name} {`];
@@ -68,13 +77,13 @@ function buildEntityBlock(model: DmmfModel): string[] {
       if (field.isUnique && !field.isId) tags.push('UK');
       // Mermaid 11: várias chaves no mesmo atributo → separar por vírgula (ex.: PK, FK).
       const tail = tags.length ? ` ${tags.join(', ')}` : '';
-      lines.push(`    ${t} ${field.name}${tail}`);
+      lines.push(`    ${t} ${field.name}${tail}${mermaidAttributeComment(model.name, field)}`);
     } else if (field.kind === 'enum') {
       const tags: string[] = [];
       if (field.isId) tags.push('PK');
       if (field.isUnique && !field.isId) tags.push('UK');
       const tail = tags.length ? ` ${tags.join(', ')}` : '';
-      lines.push(`    ${field.type} ${field.name}${tail}`);
+      lines.push(`    ${field.type} ${field.name}${tail}${mermaidAttributeComment(model.name, field)}`);
     }
   }
 

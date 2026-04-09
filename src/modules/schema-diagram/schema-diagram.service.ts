@@ -20,7 +20,7 @@ export type SchemaTablesDocumentationDto = {
 };
 
 /** Incrementar quando a lógica de mermaid ou doc mudar (invalida cache). */
-const SCHEMA_CACHE_REVISION = 4;
+const SCHEMA_CACHE_REVISION = 5;
 
 type CachedPayload = {
   mtimeMs: number;

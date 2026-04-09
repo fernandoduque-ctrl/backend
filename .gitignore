@@ -32,6 +32,9 @@ prisma/seed.js
 prisma/seed.js.map
 prisma/seed.d.ts
 
+# Local scripts (not tracked)
+scripts/
+
 # Test / coverage
 coverage
 
