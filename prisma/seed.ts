@@ -465,7 +465,6 @@ async function main() {
     },
   });
 
-  await prisma.bankReference.deleteMany();
   const banks = [
     { code: '001', name: 'Banco do Brasil S.A.' },
     { code: '033', name: 'Banco Santander (Brasil) S.A.' },
@@ -477,7 +476,11 @@ async function main() {
     { code: '336', name: 'Banco C6 S.A.' },
   ];
   for (const b of banks) {
-    await prisma.bankReference.create({ data: { code: b.code, name: b.name, isActive: true } });
+    await prisma.bankReference.upsert({
+      where: { code: b.code },
+      update: { name: b.name, isActive: true },
+      create: { code: b.code, name: b.name, isActive: true },
+    });
   }
 
   let company = await prisma.company.findFirst({

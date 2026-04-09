@@ -9,7 +9,7 @@
     "build": "nest build",
     "build:deploy": "prisma generate && npm run build && prisma migrate deploy",
     "start": "nest start",
-    "start:prod": "node lib/src/main.js",
+    "start:prod": "prisma migrate deploy && node lib/src/main.js",
     "start:dev": "nest start --watch",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
