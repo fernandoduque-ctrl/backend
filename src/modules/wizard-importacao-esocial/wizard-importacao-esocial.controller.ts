@@ -6,10 +6,10 @@ import { CompaniesContextService } from '../companies/companies-context.service'
 import { onlyDigits, isValidCNPJ } from '../../common/utils/br-validators';
 import { CurrentUser, JwtUser } from '../../common/decorators/current-user.decorator';
 
-@ApiTags('wizard-stage-6')
+@ApiTags('wizard-importacao-esocial')
 @ApiBearerAuth()
-@Controller('wizard/stage-6')
-export class WizardStage6Controller {
+@Controller('wizard/importacao-esocial')
+export class WizardImportacaoEsocialController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ctx: CompaniesContextService,
@@ -43,12 +43,12 @@ export class WizardStage6Controller {
         reasons.push(`Etapa ${n} deve estar aprovada.`);
       }
     }
-    const stage6 = stages.find((s) => s.stageNumber === 6);
+    const etapaImportacaoEsocial = stages.find((s) => s.stageNumber === 6);
     return {
       allowed,
       reasons,
       companyId,
-      stage6,
+      etapaImportacaoEsocial,
       batchesUrl: '/esocial-import/batches',
     };
   }

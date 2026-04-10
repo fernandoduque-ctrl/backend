@@ -35,37 +35,37 @@ export const SWAGGER_TAG_DEFINITIONS: ReadonlyArray<{ name: string; description:
   {
     name: 'wizard',
     description:
-      'Fluxo principal do assistente de parametrização: etapas, envio para validação, aprovação e reprovação por consultor/admin, conclusão de passos.',
+      'Fluxo principal do assistente: `GET /wizard/etapas`, detalhe `GET /wizard/etapas/:etapaNumero`, envio `POST .../submit`, aprovação/reprovação por consultor/admin e conclusão de passos `POST /wizard/passos/:etapaNumero/:passoNumero/complete`.',
   },
   {
-    name: 'wizard-stage-1',
+    name: 'wizard-empresa-cadastro',
     description:
-      'Etapa 1 — Identidade da empresa: nome fantasia, dados da matriz, filiais, marca/logotipos e resumo para checklist.',
+      'Identificação e cadastro da empresa (etapa 1 do assistente). Rotas REST em `/wizard/empresa-cadastro`: matriz, filiais, identidade visual e resumo do checklist.',
   },
   {
-    name: 'wizard-stage-2',
+    name: 'wizard-folha-operacional',
     description:
-      'Etapa 2 — Estrutura operacional: resumo de contagens (jornadas, centros de custo, bancos de pagamento, departamentos).',
+      'Estrutura operacional da folha (etapa 2). Rotas em `/wizard/folha-operacional`: resumo de jornadas, centros de custo, bancos de pagamento e departamentos.',
   },
   {
-    name: 'wizard-stage-3',
+    name: 'wizard-historico-trabalhadores',
     description:
-      'Etapa 3 — Folha e pessoas: previdência complementar, holerites históricos, registro de empregados, alívio tributário e indicadores do checklist.',
+      'Base histórica e trabalhadores (etapa 3). Rotas em `/wizard/historico-trabalhadores`: previdência, holerites, afastamentos, dependentes, férias e indicadores.',
   },
   {
-    name: 'wizard-stage-4',
+    name: 'wizard-beneficios',
     description:
-      'Etapa 4 — Benefícios: resumo, checklist de regras, fornecedores e alertas de conformidade (ex.: vale-transporte).',
+      'Parametrização de benefícios (etapa 4). Rotas em `/wizard/beneficios`: resumo, regras, fornecedores e alertas (ex.: vale-transporte).',
   },
   {
-    name: 'wizard-stage-5',
+    name: 'wizard-rubricas-eventos',
     description:
-      'Etapa 5 — Rubricas de folha: resumo e validação de incidências cadastradas.',
+      'Rubricas e eventos de folha (etapa 5). Rotas em `/wizard/rubricas-eventos`: resumo e validação de incidências cadastradas.',
   },
   {
-    name: 'wizard-stage-6',
+    name: 'wizard-importacao-esocial',
     description:
-      'Etapa 6 — eSocial: pré-requisitos de acesso (CNPJ e etapas 1–5 aprovadas), resumo e lotes de importação recentes.',
+      'Importação histórica eSocial (etapa 6). Rotas em `/wizard/importacao-esocial`: pré-requisitos de acesso, resumo e lotes recentes.',
   },
   {
     name: 'work-schedules',

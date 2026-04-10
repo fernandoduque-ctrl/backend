@@ -96,10 +96,10 @@ class TaxReliefDto {
   notes?: string;
 }
 
-@ApiTags('wizard-stage-3')
+@ApiTags('wizard-historico-trabalhadores')
 @ApiBearerAuth()
-@Controller('wizard/stage-3')
-export class WizardStage3Controller {
+@Controller('wizard/historico-trabalhadores')
+export class WizardHistoricoTrabalhadoresController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ctx: CompaniesContextService,

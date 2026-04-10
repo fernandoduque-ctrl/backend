@@ -12,12 +12,12 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { UsersModule } from './modules/users/users.module';
 import { WizardModule } from './modules/wizard/wizard.module';
-import { WizardStage1Module } from './modules/wizard-stage1/wizard-stage1.module';
-import { WizardStage2Module } from './modules/wizard-stage2/wizard-stage2.module';
-import { WizardStage3Module } from './modules/wizard-stage3/wizard-stage3.module';
-import { WizardStage4Module } from './modules/wizard-stage4/wizard-stage4.module';
-import { WizardStage5Module } from './modules/wizard-stage5/wizard-stage5.module';
-import { WizardStage6Module } from './modules/wizard-stage6/wizard-stage6.module';
+import { WizardEmpresaCadastroModule } from './modules/wizard-empresa-cadastro/wizard-empresa-cadastro.module';
+import { WizardFolhaOperacionalModule } from './modules/wizard-folha-operacional/wizard-folha-operacional.module';
+import { WizardHistoricoTrabalhadoresModule } from './modules/wizard-historico-trabalhadores/wizard-historico-trabalhadores.module';
+import { WizardBeneficiosModule } from './modules/wizard-beneficios/wizard-beneficios.module';
+import { WizardRubricasEventosModule } from './modules/wizard-rubricas-eventos/wizard-rubricas-eventos.module';
+import { WizardImportacaoEsocialModule } from './modules/wizard-importacao-esocial/wizard-importacao-esocial.module';
 import { WorkSchedulesModule } from './modules/work-schedules/work-schedules.module';
 import { CostCentersModule } from './modules/cost-centers/cost-centers.module';
 import { BanksModule } from './modules/banks/banks.module';
@@ -45,12 +45,12 @@ import { SchemaDiagramModule } from './modules/schema-diagram/schema-diagram.mod
     DashboardModule,
     UsersModule,
     WizardModule,
-    WizardStage1Module,
-    WizardStage2Module,
-    WizardStage3Module,
-    WizardStage4Module,
-    WizardStage5Module,
-    WizardStage6Module,
+    WizardEmpresaCadastroModule,
+    WizardFolhaOperacionalModule,
+    WizardHistoricoTrabalhadoresModule,
+    WizardBeneficiosModule,
+    WizardRubricasEventosModule,
+    WizardImportacaoEsocialModule,
     WorkSchedulesModule,
     CostCentersModule,
     BanksModule,

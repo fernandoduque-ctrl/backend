@@ -3,10 +3,10 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CompaniesContextService } from '../companies/companies-context.service';
 
-@ApiTags('wizard-stage-2')
+@ApiTags('wizard-folha-operacional')
 @ApiBearerAuth()
-@Controller('wizard/stage-2')
-export class WizardStage2Controller {
+@Controller('wizard/folha-operacional')
+export class WizardFolhaOperacionalController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ctx: CompaniesContextService,

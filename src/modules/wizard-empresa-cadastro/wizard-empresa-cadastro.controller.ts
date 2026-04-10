@@ -140,10 +140,10 @@ class BranchCreateDto {
   isActive?: boolean;
 }
 
-@ApiTags('wizard-stage-1')
+@ApiTags('wizard-empresa-cadastro')
 @ApiBearerAuth()
-@Controller('wizard/stage-1')
-export class WizardStage1Controller {
+@Controller('wizard/empresa-cadastro')
+export class WizardEmpresaCadastroController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ctx: CompaniesContextService,

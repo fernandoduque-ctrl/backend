@@ -14,6 +14,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CompaniesContextService } from '../companies/companies-context.service';
 import { onlyDigits, isValidCNPJ } from '../../common/utils/br-validators';
 
+/** Índice da etapa “importação eSocial” em `WizardStage.stageNumber` (seed do assistente). */
+const WIZARD_ETAPA_IMPORTACAO_ESOCIAL_NUM = 6;
+
 @Injectable()
 export class EsocialImportService {
   constructor(
@@ -21,13 +24,13 @@ export class EsocialImportService {
     private readonly ctx: CompaniesContextService,
   ) {}
 
-  async assertStage6Access(userId: string, _role: string) {
+  async assertImportacaoEsocialWizardAccess(userId: string, _role: string) {
     void _role;
     /* Cliente da empresa, consultor ou admin: contexto de empresa via JWT + interceptor. */
     const companyId = await this.ctx.getCurrentCompanyId();
     const company = await this.prisma.company.findUnique({ where: { id: companyId } });
     if (!company?.taxId || onlyDigits(company.taxId).length !== 14) {
-      throw new BadRequestException('CNPJ da matriz obrigatório e válido para a Etapa 6.');
+      throw new BadRequestException('CNPJ da matriz obrigatório e válido para a importação eSocial.');
     }
     if (!isValidCNPJ(company.taxId)) {
       throw new BadRequestException('CNPJ da empresa inválido.');
@@ -38,7 +41,7 @@ export class EsocialImportService {
       });
       if (!st || st.status !== WizardStatus.APPROVED) {
         throw new BadRequestException(
-          `Etapa 6 bloqueada: a etapa ${s} precisa estar aprovada antes da importação.`,
+          `Importação eSocial bloqueada: a etapa ${s} precisa estar aprovada antes da importação.`,
         );
       }
     }
@@ -58,7 +61,7 @@ export class EsocialImportService {
       selectedEvents: string[];
     },
   ) {
-    const { companyId, company } = await this.assertStage6Access(userId, role);
+    const { companyId, company } = await this.assertImportacaoEsocialWizardAccess(userId, role);
     const certCnpj = body.certificateTaxId ? onlyDigits(body.certificateTaxId) : '';
     const companyCnpj = onlyDigits(company!.taxId!);
     if (certCnpj && certCnpj !== companyCnpj) {
@@ -285,7 +288,7 @@ export class EsocialImportService {
       },
     });
     await this.prisma.wizardStage.updateMany({
-      where: { companyId: batch.companyId, stageNumber: 6 },
+      where: { companyId: batch.companyId, stageNumber: WIZARD_ETAPA_IMPORTACAO_ESOCIAL_NUM },
       data: {
         status: WizardStatus.APPROVED,
         approvedAt: new Date(),
