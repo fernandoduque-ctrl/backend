@@ -6,11 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// Enums de domínio são String no SQLite; constantes em src/common/prisma-enums.ts
+// Enums de domínio persistidos como String; constantes em src/common/prisma-enums.ts
 
 model User {
   id           String   @id @default(uuid())

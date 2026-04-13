@@ -9,7 +9,7 @@ const { runMigrateDeploy } = require('./migrate-deploy.cjs');
 
 loadInstrumentEnv();
 
-const mainJs = path.join(root, 'lib', 'src', 'main.js');
+const mainJs = path.join(root, 'dist', 'src', 'main.js');
 
 function startHealthStub() {
   const port = Number(process.env.PORT || 3001);
@@ -33,7 +33,7 @@ async function run() {
   if (needCompile) {
     healthServer = await startHealthStub();
     console.warn(
-      '[start-prod] lib/ ausente — compilando no startup. Ideal na Render: Build Command = yarn && yarn build:deploy',
+      '[start-prod] dist/ ausente — compilando no startup. Ideal na Render: Build Command = yarn && yarn build:deploy',
     );
     try {
       execSync('npx prisma generate', {
@@ -57,7 +57,7 @@ async function run() {
   }
 
   if (!existsSync(mainJs)) {
-    console.error('[start-prod] Falha: lib/src/main.js ainda não existe após nest build.');
+    console.error('[start-prod] Falha: dist/src/main.js ainda não existe após nest build.');
     process.exit(1);
   }
 

@@ -1,0 +1,20 @@
+# Uso: com Docker Desktop em execução, na pasta backend:
+#   docker compose -f docker-compose.postgres.yml up -d
+# DATABASE_URL (exemplo na porta 5433):
+#   postgresql://postgres:postgres@localhost:5433/folha_wizard?schema=public
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: folha_wizard_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: folha_wizard
+    ports:
+      - '5433:5432'
+    volumes:
+      - folha_wizard_pgdata:/var/lib/postgresql/data
+
+volumes:
+  folha_wizard_pgdata:

@@ -23,9 +23,11 @@ Thumbs.db
 storage/*
 !storage/.gitkeep
 
-# Local SQLite (recriar com migrate/seed)
+# SQLite local (legado; o projeto usa PostgreSQL)
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 
 # Prisma: keep schema + migrations; ignore accidental TS compile of seed
 prisma/seed.js

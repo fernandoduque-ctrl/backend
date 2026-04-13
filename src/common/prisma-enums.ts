@@ -1,4 +1,4 @@
-/** Valores persistidos como string no SQLite (substitui enums do Prisma). */
+/** Valores persistidos como string no banco (substitui enums do Prisma). */
 
 export const UserRole = {
   ADMIN: 'ADMIN',
