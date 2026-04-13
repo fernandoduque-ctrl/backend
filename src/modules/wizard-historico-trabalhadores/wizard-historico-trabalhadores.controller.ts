@@ -6,7 +6,7 @@ import {
   ApiPropertyOptional,
   ApiTags,
 } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CompaniesContextService } from '../companies/companies-context.service';

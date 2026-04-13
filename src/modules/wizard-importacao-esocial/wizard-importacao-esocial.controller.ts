@@ -22,7 +22,7 @@ export class WizardImportacaoEsocialController {
       'Indica se o usuário pode operar a importação eSocial: CNPJ da matriz válido e etapas 1 a 5 com status APROVADO. ' +
       'Retorna motivos em `reasons` quando bloqueado, estado da etapa 6 e URL sugerida dos lotes.',
   })
-  async access(@CurrentUser() _user: JwtUser) {
+  async access() {
     const companyId = await this.ctx.getCurrentCompanyId();
     const company = await this.prisma.company.findUnique({ where: { id: companyId } });
     const stages = await this.prisma.wizardStage.findMany({
